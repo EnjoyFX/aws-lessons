@@ -1,0 +1,47 @@
+AWSTemplateFormatVersion : "2010-09-09"
+Description: AutoScalingGroup with 2 EC2s with ssh and http access and java8
+Parameters:
+    MyKeyPairName:
+        Type: String
+        Default: ash-go2
+        Description: Enter a key pair name
+Resources:
+    MyAutoScalingLaunchConfiguration:
+        Type: AWS::AutoScaling::LaunchConfiguration
+        Properties:
+           KeyName: !Ref MyKeyPairName
+           InstanceType: t2.micro
+           ImageId: ami-0c94855ba95c71c99
+           SecurityGroups:
+               - !Ref MySecurityGroup
+           UserData:
+             Fn::Base64: |
+                 #!/bin/bash
+                 sudo su
+                 yum update -y
+                 yum install -y java-1.8.0-openjdk
+                 yum install -y httpd
+                 service httpd start
+                 chkconfig httpd on
+                 cd /var/www/html
+                 echo "<html><h1>This instance is visible</h1></html>" > index.html
+    MySecurityGroup:
+        Type: AWS::EC2::SecurityGroup
+        Properties:
+            GroupDescription: Allowing SSH from everywhere
+            SecurityGroupIngress:
+            - IpProtocol: tcp
+              FromPort: 22 #Integer
+              ToPort: 22 #Integer
+              CidrIp: 0.0.0.0/0
+            - IpProtocol: tcp
+              FromPort: 80
+              ToPort: 80
+              CidrIp: 0.0.0.0/0
+    MyAutoscalingGroup:
+        Type: AWS::AutoScaling::AutoScalingGroup
+        Properties:
+            AvailabilityZones: !GetAZs ''
+            MinSize: '2' #String
+            MaxSize: '2' #String
+            LaunchConfigurationName: !Ref MyAutoScalingLaunchConfiguration #defined above

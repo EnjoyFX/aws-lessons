@@ -1,0 +1,57 @@
+Create two subnets: public and private
+
+Add NAT bastion to connect to EC2 instances
+
+Put all JAR files into S3 manually or via SH script
+
+EC2 instances must be with java8 environment
+
+Health check for ELB: /health
+
+Create a DynamoDB database with next params:
+
+    TableName: “edu-lohika-training-aws-dynamodb”
+
+    Field: UserName, type: String
+
+Create an Aurora database (RDS) or Postgres with next params:
+
+    DBName: “EduLohikaTrainingAwsRds”
+
+    Port: 5432
+
+    User/password: rootuser/rootuser
+
+    (you don’t need to define a schema, it will autogenerating)
+
+Create an SNS topic with the next name – “edu-lohika-training-aws-sns-topic”
+
+Create an SQS queue with the next name – “edu-lohika-training-aws-sqs-queue”
+
+Add LoadBalancer with 80 port
+
+Run into public subnet:
+
+    calc-0.0.1-SNAPSHOT.jar
+
+Run into private subnet:
+
+    persist3-0.0.1-SNAPSHOT.jar
+
+    set environment variable RDS_HOST with correct RDS address
+
+On your local machine, you need to have java 8.
+
+On your local machine execute:
+
+    java -cp calc-client-1.0-SNAPSHOT-jar-with-dependencies.jar CalcClient <ELB’s DNS name> 
+
+Get SMS notification (or create subscription for email notifications via UI)
+
+ 
+
+Implementation path:
+
+    Create all needful infrastructure via AWS Management console (UI)
+
+    Create a Terraform script which will create all needful infrastructure automatically.
